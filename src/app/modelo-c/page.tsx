@@ -6,11 +6,12 @@ import CountUp from '@/components/CountUp'
 
 const FAQ_ITEMS = [
   { q: 'Preciso pagar para a análise inicial?', a: 'Não. A análise inicial não tem custo. O Dr. Wagner avalia a situação e orienta sobre o que é possível buscar — sem nenhum compromisso financeiro nesse primeiro momento.' },
-  { q: 'Se eu entrar com uma ação, preciso pagar antecipado?', a: 'Não. Para trabalhadores que ajuízam ação trabalhista, os honorários são cobrados como percentual sobre o resultado útil bruto do caso — geralmente entre 25% e 35%.' },
-  { q: 'Preciso ter documentos para a primeira conversa?', a: 'Não necessariamente. Você pode descrever o que aconteceu mesmo sem todos os documentos em mãos. Se houver base para atuação, orientamos quais documentos reunir.' },
+  { q: 'Se eu entrar com uma ação, preciso pagar antecipado?', a: 'Não. Para trabalhadores que ajuízam ação trabalhista, os honorários são cobrados como percentual sobre o resultado útil bruto do caso — geralmente entre 25% e 35%, conforme análise do caso. Você não desembolsa nada para começar.' },
+  { q: 'Preciso ter documentos para a primeira conversa?', a: 'Não necessariamente. Você pode descrever o que aconteceu mesmo sem todos os documentos em mãos. Se houver base para atuação, orientamos quais documentos reunir e como obtê-los.' },
   { q: 'Quanto tempo tenho para entrar com uma ação trabalhista?', a: 'Em regra, o prazo é de 2 anos após o fim do contrato de trabalho, com direito a buscar os últimos 5 anos do vínculo. Por isso é importante verificar o quanto antes.' },
-  { q: 'E se eu não tiver certeza de que tenho direitos a buscar?', a: 'É exatamente para isso que serve a análise. Você não precisa ter certeza — o trabalho começa justamente por verificar se há ou não irregularidades no seu caso.' },
-  { q: 'Consigo ser atendido mesmo estando em outra cidade?', a: 'Sim. O atendimento pode ser feito de forma virtual — análise de documentos e reuniões online — para qualquer cidade do Brasil.' },
+  { q: 'E se eu não tiver certeza de que tenho direitos a buscar?', a: 'É exatamente para isso que serve a análise. Você não precisa ter certeza antes de entrar em contato — o trabalho começa justamente por verificar se há ou não irregularidades no seu caso.' },
+  { q: 'Quanto tempo demora um processo trabalhista?', a: 'Varia conforme a complexidade do caso, a possibilidade de acordo e o andamento na Justiça do Trabalho. Na análise inicial, você recebe uma estimativa realista para a sua situação específica.' },
+  { q: 'Consigo ser atendido mesmo estando em outra cidade?', a: 'Sim. O atendimento pode ser feito de forma virtual — análise de documentos e reuniões online — para quem está em qualquer cidade do Brasil.' },
 ]
 
 function FaqItem({ q, a }: { q: string; a: string }) {
@@ -137,12 +138,11 @@ export default function ModeloC() {
         </ScrollReveal>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
-            { t: 'Rescisão sem sentido', d: 'A rescisão foi assinada, mas os números não fechavam — e ninguém soube explicar.' },
+            { t: 'A rescisão não fechava', d: 'A rescisão foi assinada, mas os números não fechavam — e ninguém soube explicar.' },
             { t: 'Horas extras ignoradas', d: 'Horas extras que nunca foram pagas, mesmo fazendo parte da rotina.' },
-            { t: 'FGTS com falhas', d: 'Depósitos faltando ou multa rescisória que não veio conforme o tipo de demissão.' },
-            { t: 'Demissão irregular', d: 'Parece irregular, mas sem saber exatamente o quê — e sem orientação.' },
-            { t: 'Medo de agir', d: 'Medo de entrar com uma ação sem saber se tem base — e o prazo se esgotando.' },
-            { t: 'Prazo correndo', d: 'O tempo passa enquanto as dúvidas ficam. Cada dia conta para os seus direitos.' },
+            { t: 'FGTS com falhas', d: 'FGTS com depósitos faltando ou multa que não veio.' },
+            { t: 'Demissão irregular', d: 'Demissão que parece irregular, mas sem saber exatamente o quê.' },
+            { t: 'Medo de agir sem base', d: 'Medo de entrar com uma ação sem saber se tem base — e o prazo se esgotando.' },
           ].map((card, i) => (
             <ScrollReveal key={card.t} type="up" delay={i * 0.07}>
               <div className="bg-white rounded-xl p-6 border border-chumbo/8 h-full">
@@ -181,6 +181,11 @@ export default function ModeloC() {
                 </div>
               </ScrollReveal>
             ))}
+          </div>
+          <div className="mt-10">
+            <a href="#formulario" className="inline-block border border-white/30 hover:border-borde text-white hover:text-borde font-display font-bold py-4 px-8 text-sm uppercase tracking-widest transition-colors" style={{ fontFamily: 'Archivo, sans-serif' }}>
+              Quero que analisem meu caso
+            </a>
           </div>
         </div>
       </section>
@@ -231,9 +236,8 @@ export default function ModeloC() {
               { t: 'Visão dos dois lados', d: 'Defendeu tanto trabalhadores quanto empregadores. Conhece os argumentos que serão usados contra você.' },
               { t: 'Análise do caso real', d: 'Cada caso avaliado pelo que realmente aconteceu: provas, prazos, risco e o caminho mais adequado.' },
               { t: 'Comunicação direta', d: 'Você entende exatamente a sua situação — sem linguagem jurídica desnecessária.' },
-              { t: 'Especialização trabalhista', d: 'Formação e prática focadas exclusivamente na área trabalhista desde o início da carreira.' },
-              { t: 'Sem promessas irreais', d: 'Análise honesta do que o caso apresenta, com orientação responsável sobre o possível.' },
-              { t: 'Atendimento virtual', d: 'Análise de documentos e reuniões online para clientes em qualquer cidade do Brasil.' },
+              { t: 'Especialização em Direito do Trabalho', d: 'Formação e prática focadas exclusivamente na área trabalhista desde o início da carreira — não é uma área secundária do escritório.' },
+              { t: 'Sem promessas irreais', d: 'O que você recebe é uma análise honesta do que o caso apresenta, com orientação responsável sobre o que é possível buscar.' },
             ].map((d, i) => (
               <ScrollReveal key={d.t} type="scale" delay={i * 0.07}>
                 <div className="bg-white rounded-xl p-6 border border-chumbo/5 h-full">
@@ -326,7 +330,7 @@ export default function ModeloC() {
               Se algo na sua demissão não fez sentido, ou se você suspeita que seus direitos não foram respeitados — o momento de verificar é agora.
             </p>
             <div className="max-w-md mx-auto bg-white/10 rounded-2xl p-8">
-              <ContactForm variant="dark" modelo="c-cta" />
+              <ContactForm variant="dark" modelo="c-cta" ctaLabel="Analisar meu caso agora" />
             </div>
           </ScrollReveal>
         </div>
@@ -343,6 +347,7 @@ export default function ModeloC() {
             <p>Av. São Sebastião, 3161, Ed. Xingú, sala 103</p>
             <p>Quilombo, Cuiabá/MT</p>
             <a href="tel:+5565996768610" className="hover:text-borde transition-colors block">(65) 9 9676-8610</a>
+            <p className="text-white/30 mt-1">OAB/MT XXXXX</p>
           </div>
         </div>
         <div className="max-w-6xl mx-auto border-t border-white/10 pt-6">

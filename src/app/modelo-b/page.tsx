@@ -4,10 +4,11 @@ import ContactForm from '@/components/ContactForm'
 
 const FAQ_ITEMS = [
   { q: 'Preciso pagar para a análise inicial?', a: 'Não. A análise inicial não tem custo. O Dr. Wagner avalia a situação e orienta sobre o que é possível buscar — sem nenhum compromisso financeiro nesse primeiro momento.' },
-  { q: 'Se eu entrar com uma ação, preciso pagar antecipado?', a: 'Não. Para trabalhadores que ajuízam ação trabalhista, os honorários são cobrados como percentual sobre o resultado útil bruto do caso — geralmente entre 25% e 35%, conforme análise do caso.' },
+  { q: 'Se eu entrar com uma ação, preciso pagar antecipado?', a: 'Não. Para trabalhadores que ajuízam ação trabalhista, os honorários são cobrados como percentual sobre o resultado útil bruto do caso — geralmente entre 25% e 35%, conforme análise do caso. Você não desembolsa nada para começar.' },
   { q: 'Preciso ter documentos para a primeira conversa?', a: 'Não necessariamente. Você pode descrever o que aconteceu mesmo sem todos os documentos em mãos. Se houver base para atuação, orientamos quais documentos reunir e como obtê-los.' },
   { q: 'Quanto tempo tenho para entrar com uma ação trabalhista?', a: 'Em regra, o prazo é de 2 anos após o fim do contrato de trabalho, com direito a buscar os últimos 5 anos do vínculo. Por isso é importante verificar o quanto antes.' },
-  { q: 'E se eu não tiver certeza de que tenho direitos a buscar?', a: 'É exatamente para isso que serve a análise. Você não precisa ter certeza antes de entrar em contato — o trabalho começa justamente por verificar se há ou não irregularidades.' },
+  { q: 'E se eu não tiver certeza de que tenho direitos a buscar?', a: 'É exatamente para isso que serve a análise. Você não precisa ter certeza antes de entrar em contato — o trabalho começa justamente por verificar se há ou não irregularidades no seu caso.' },
+  { q: 'Quanto tempo demora um processo trabalhista?', a: 'Varia conforme a complexidade do caso, a possibilidade de acordo e o andamento na Justiça do Trabalho. Na análise inicial, você recebe uma estimativa realista para a sua situação específica.' },
   { q: 'Consigo ser atendido mesmo estando em outra cidade?', a: 'Sim. O atendimento pode ser feito de forma virtual — análise de documentos e reuniões online — para quem está em qualquer cidade do Brasil.' },
 ]
 
@@ -154,6 +155,11 @@ export default function ModeloB() {
               </div>
             ))}
           </div>
+          <div className="mt-10">
+            <a href="#formulario" className="inline-block border border-white/30 hover:border-borde text-white hover:text-borde font-display font-bold py-4 px-8 text-sm uppercase tracking-widest transition-colors" style={{ fontFamily: 'Archivo, sans-serif' }}>
+              Quero que analisem meu caso
+            </a>
+          </div>
         </div>
       </section>
 
@@ -202,10 +208,11 @@ export default function ModeloB() {
             </div>
             <div className="space-y-4">
               {[
-                { t: 'Visão dos dois lados', d: 'Ao longo de 13 anos, defendeu tanto trabalhadores quanto empregadores. Conhece os argumentos que serão usados contra você.' },
-                { t: 'Análise do caso real', d: 'Cada caso avaliado pelo que realmente aconteceu: provas, prazos, risco e o caminho mais adequado.' },
-                { t: 'Comunicação direta', d: 'Você entende exatamente a sua situação — sem linguagem jurídica desnecessária.' },
-                { t: 'Sem promessas irreais', d: 'Análise honesta do que o caso apresenta, com orientação responsável sobre o possível.' },
+                { t: 'Visão dos dois lados', d: 'Ao longo de 13 anos, o Dr. Wagner defendeu tanto trabalhadores quanto empregadores. Conhece os argumentos que serão usados contra você — e como respondê-los com base no caso concreto.' },
+                { t: 'Análise do caso real', d: 'Nenhuma resposta padrão. Cada caso é avaliado pelo que realmente aconteceu: as provas disponíveis, os prazos, o risco envolvido e o caminho mais adequado para aquela situação específica.' },
+                { t: 'Comunicação direta', d: 'Você entende exatamente qual é a sua situação, quais são os riscos e o que pode ser feito — sem linguagem jurídica desnecessária.' },
+                { t: 'Especialização em Direito do Trabalho', d: 'Formação e prática focadas exclusivamente na área trabalhista desde o início da carreira — não é uma área secundária do escritório.' },
+                { t: 'Sem promessas irreais', d: 'O que você recebe é uma análise honesta do que o caso apresenta, com orientação responsável sobre o que é possível buscar.' },
               ].map((d) => (
                 <div key={d.t} className="flex items-start gap-4 py-4 border-b border-white/8" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
                   <div className="w-1.5 h-1.5 rounded-full bg-borde flex-shrink-0 mt-2" />
@@ -247,7 +254,7 @@ export default function ModeloB() {
               </p>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-xl p-8">
-              <ContactForm variant="dark" modelo="b" />
+              <ContactForm variant="dark" modelo="b" ctaLabel="Analisar meu caso agora" />
             </div>
           </div>
         </div>
@@ -263,6 +270,7 @@ export default function ModeloB() {
           <div className="text-xs font-body text-white/30 text-right space-y-1">
             <p>Av. São Sebastião, 3161, Ed. Xingú, sala 103 — Quilombo, Cuiabá/MT</p>
             <a href="tel:+5565996768610" className="hover:text-borde transition-colors block">(65) 9 9676-8610</a>
+            <p className="text-white/30 mt-1">OAB/MT XXXXX</p>
           </div>
         </div>
         <div className="max-w-6xl mx-auto mt-6 pt-6 border-t border-white/6" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>

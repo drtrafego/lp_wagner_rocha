@@ -6,11 +6,12 @@ import CountUp from '@/components/CountUp'
 
 const FAQ_ITEMS = [
   { q: 'Preciso pagar para a análise inicial?', a: 'Não. A análise inicial não tem custo. O Dr. Wagner avalia a situação e orienta sobre o que é possível buscar — sem nenhum compromisso financeiro nesse primeiro momento.' },
-  { q: 'Se eu entrar com uma ação, preciso pagar antecipado?', a: 'Não. Os honorários são cobrados como percentual sobre o resultado útil bruto do caso — geralmente entre 25% e 35%. Você não desembolsa nada para começar.' },
-  { q: 'Preciso ter documentos para a primeira conversa?', a: 'Não necessariamente. Você pode descrever o que aconteceu mesmo sem todos os documentos. Se houver base, orientamos quais documentos reunir.' },
-  { q: 'Quanto tempo tenho para entrar com uma ação trabalhista?', a: 'Em regra, 2 anos após o fim do contrato de trabalho, com direito a buscar os últimos 5 anos do vínculo. Verifique o quanto antes.' },
-  { q: 'E se eu não tiver certeza de que tenho direitos a buscar?', a: 'É exatamente para isso que serve a análise. Você não precisa ter certeza — o trabalho começa por verificar se há irregularidades.' },
-  { q: 'Consigo ser atendido em outra cidade?', a: 'Sim. Atendimento virtual disponível — análise de documentos e reuniões online para qualquer cidade do Brasil.' },
+  { q: 'Se eu entrar com uma ação, preciso pagar antecipado?', a: 'Não. Para trabalhadores que ajuízam ação trabalhista, os honorários são cobrados como percentual sobre o resultado útil bruto do caso — geralmente entre 25% e 35%, conforme análise do caso. Você não desembolsa nada para começar.' },
+  { q: 'Preciso ter documentos para a primeira conversa?', a: 'Não necessariamente. Você pode descrever o que aconteceu mesmo sem todos os documentos em mãos. Se houver base para atuação, orientamos quais documentos reunir e como obtê-los.' },
+  { q: 'Quanto tempo tenho para entrar com uma ação trabalhista?', a: 'Em regra, o prazo é de 2 anos após o fim do contrato de trabalho, com direito a buscar os últimos 5 anos do vínculo. Por isso é importante verificar o quanto antes.' },
+  { q: 'E se eu não tiver certeza de que tenho direitos a buscar?', a: 'É exatamente para isso que serve a análise. Você não precisa ter certeza antes de entrar em contato — o trabalho começa justamente por verificar se há ou não irregularidades no seu caso.' },
+  { q: 'Quanto tempo demora um processo trabalhista?', a: 'Varia conforme a complexidade do caso, a possibilidade de acordo e o andamento na Justiça do Trabalho. Na análise inicial, você recebe uma estimativa realista para a sua situação específica.' },
+  { q: 'Consigo ser atendido mesmo estando em outra cidade?', a: 'Sim. O atendimento pode ser feito de forma virtual — análise de documentos e reuniões online — para quem está em qualquer cidade do Brasil.' },
 ]
 
 function FaqItem({ q, a }: { q: string; a: string }) {
@@ -163,12 +164,11 @@ export default function ModeloD() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { t: 'Rescisão sem sentido', d: 'A rescisão foi assinada, mas os números não fechavam — e ninguém soube explicar.' },
+              { t: 'A rescisão não fechava', d: 'A rescisão foi assinada, mas os números não fechavam — e ninguém soube explicar.' },
               { t: 'Horas extras ignoradas', d: 'Horas extras que nunca foram pagas, mesmo fazendo parte da rotina.' },
-              { t: 'FGTS com falhas', d: 'Depósitos faltando ou multa rescisória que não veio conforme o tipo de demissão.' },
-              { t: 'Demissão irregular', d: 'Parece irregular, mas sem saber exatamente o quê — e sem orientação adequada.' },
-              { t: 'Medo de agir', d: 'Medo de entrar com ação sem saber se tem base — e o prazo se esgotando.' },
-              { t: 'Prazo correndo', d: 'O tempo passa enquanto as dúvidas ficam. Cada dia conta para os seus direitos.' },
+              { t: 'FGTS com falhas', d: 'FGTS com depósitos faltando ou multa que não veio.' },
+              { t: 'Demissão irregular', d: 'Demissão que parece irregular, mas sem saber exatamente o quê.' },
+              { t: 'Medo de agir sem base', d: 'Medo de entrar com uma ação sem saber se tem base — e o prazo se esgotando.' },
             ].map((card, i) => (
               <ScrollReveal key={card.t} type={i % 3 === 0 ? 'left' : i % 3 === 2 ? 'right' : 'up'} delay={i * 0.08}>
                 <div className="border border-white/8 rounded-lg p-6 hover:border-borde/40 transition-colors h-full" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
@@ -215,6 +215,11 @@ export default function ModeloD() {
                   </div>
                 </ScrollReveal>
               ))}
+              <div className="pt-6">
+                <a href="#formulario" className="inline-block border border-white/30 hover:border-borde text-white hover:text-borde font-display font-bold py-4 px-8 text-sm uppercase tracking-widest transition-colors" style={{ fontFamily: 'Archivo, sans-serif' }}>
+                  Quero que analisem meu caso
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -352,7 +357,7 @@ export default function ModeloD() {
 
             <ScrollReveal type="right" delay={0.1}>
               <div className="border border-white/10 rounded-xl p-8 bg-white/4" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                <ContactForm variant="dark" modelo="d-cta" />
+                <ContactForm variant="dark" modelo="d-cta" ctaLabel="Analisar meu caso agora" />
               </div>
             </ScrollReveal>
           </div>
@@ -369,6 +374,7 @@ export default function ModeloD() {
           <div className="text-xs font-body text-white/20 text-right space-y-1">
             <p>Av. São Sebastião, 3161, Ed. Xingú, sala 103 — Quilombo, Cuiabá/MT</p>
             <a href="tel:+5565996768610" className="hover:text-borde transition-colors block">(65) 9 9676-8610</a>
+            <p className="text-white/20 mt-1">OAB/MT XXXXX</p>
           </div>
         </div>
         <div className="max-w-6xl mx-auto mt-6 pt-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>

@@ -6,6 +6,7 @@ interface Props {
   variant?: 'light' | 'dark'
   modelo?: string
   className?: string
+  ctaLabel?: string
 }
 
 declare global {
@@ -20,7 +21,7 @@ function getUTM(param: string): string {
   return new URLSearchParams(window.location.search).get(param) ?? ''
 }
 
-export default function ContactForm({ variant = 'light', modelo = 'a', className = '' }: Props) {
+export default function ContactForm({ variant = 'light', modelo = 'a', className = '', ctaLabel }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -147,7 +148,7 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
               : 'w-full bg-borde hover:bg-borde-deep text-white font-display font-bold py-4 px-6 rounded text-sm uppercase tracking-widest transition-colors disabled:opacity-60'
           }
         >
-          {loading ? 'Enviando...' : 'Analisar meu caso'}
+          {loading ? 'Enviando...' : (ctaLabel ?? 'Analisar meu caso')}
         </button>
 
         <p className={`text-xs text-center ${isDark ? 'text-white/40' : 'text-chumbo/40'} font-body`}>
