@@ -49,31 +49,42 @@ A página raiz `/` exibe um seletor para navegar entre os modelos (uso interno, 
 lp_wagner_rocha/
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx          ← Meta Pixel + GA4 (carregados em todas as páginas)
-│   │   ├── page.tsx            ← Seletor de modelos (uso interno)
-│   │   ├── globals.css         ← Estilos globais + classes de animação CSS
-│   │   ├── modelo-a/page.tsx   ← LP editorial claro, sem animação
-│   │   ├── modelo-b/page.tsx   ← LP dark premium, sem animação
-│   │   ├── modelo-c/page.tsx   ← LP editorial claro, com animação
-│   │   ├── modelo-d/page.tsx   ← LP dark premium, com animação
-│   │   ├── obrigado/page.tsx   ← Página de conversão + link WhatsApp
+│   │   ├── layout.tsx               ← Metadata global SEO/GEO + Meta Pixel + GA4 + JsonLd
+│   │   ├── page.tsx                 ← Seletor de modelos (uso interno)
+│   │   ├── globals.css              ← Estilos globais + classes de animação CSS
+│   │   ├── robots.ts                ← Regras de indexação (/api/ bloqueado)
+│   │   ├── sitemap.ts               ← Sitemap dinâmico (/ e /obrigado)
+│   │   ├── modelo-a/
+│   │   │   ├── layout.tsx           ← Metadata + canonical específicos do modelo A
+│   │   │   └── page.tsx             ← LP editorial claro, sem animação
+│   │   ├── modelo-b/
+│   │   │   ├── layout.tsx           ← Metadata + canonical específicos do modelo B
+│   │   │   └── page.tsx             ← LP dark premium, sem animação
+│   │   ├── modelo-c/
+│   │   │   ├── layout.tsx           ← Metadata + canonical específicos do modelo C
+│   │   │   └── page.tsx             ← LP editorial claro, com animação
+│   │   ├── modelo-d/
+│   │   │   ├── layout.tsx           ← Metadata + canonical específicos do modelo D
+│   │   │   └── page.tsx             ← LP dark premium, com animação
+│   │   ├── obrigado/page.tsx        ← Página de conversão + link WhatsApp
 │   │   └── api/
 │   │       └── contact/
-│   │           └── route.ts    ← POST /api/contact (toda lógica de backend)
+│   │           └── route.ts         ← POST /api/contact (toda lógica de backend)
 │   ├── components/
-│   │   ├── ContactForm.tsx     ← Formulário compartilhado (variante light/dark)
-│   │   ├── MetaPixel.tsx       ← Pixel Meta client-side
-│   │   ├── GoogleAnalytics.tsx ← GA4 client-side
-│   │   ├── ScrollReveal.tsx    ← Intersection Observer para animações de scroll
-│   │   └── CountUp.tsx         ← Animação de contador numérico
+│   │   ├── ContactForm.tsx          ← Formulário compartilhado (variante light/dark)
+│   │   ├── JsonLd.tsx               ← Dados estruturados schema.org (4 schemas)
+│   │   ├── MetaPixel.tsx            ← Pixel Meta client-side
+│   │   ├── GoogleAnalytics.tsx      ← GA4 client-side
+│   │   ├── ScrollReveal.tsx         ← Intersection Observer para animações de scroll
+│   │   └── CountUp.tsx              ← Animação de contador numérico
 │   └── lib/
-│       ├── schema.ts           ← Tabela leads (Drizzle ORM)
-│       ├── db.ts               ← Conexão Neon (lazy init)
-│       └── tracking-server.ts  ← Meta CAPI com SHA-256
+│       ├── schema.ts                ← Tabela leads (Drizzle ORM)
+│       ├── db.ts                    ← Conexão Neon (lazy init)
+│       └── tracking-server.ts       ← Meta CAPI com SHA-256
 ├── drizzle.config.ts
 ├── tailwind.config.ts
-├── .env.local.example          ← Template de variáveis (preencher antes do deploy)
-└── PROJETO.md                  ← Este arquivo
+├── .env.local.example               ← Template de variáveis (preencher antes do deploy)
+└── PROJETO.md                       ← Este arquivo
 ```
 
 ---
@@ -124,6 +135,60 @@ Tabela `leads`:
 
 ---
 
+## SEO e GEO — O que está implementado
+
+### Metadata global (`src/app/layout.tsx`)
+- `title` com template `%s | Rocha Advogados` para herança por página
+- `description` otimizada para intenção de busca trabalhista local
+- `keywords` focadas em Cuiabá/MT e Mato Grosso
+- `metadataBase` configurado para URLs absolutas automáticas nas tags OG
+- `robots` avançado: `max-image-preview: large`, `max-snippet: -1`
+- `verification.google` via `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`
+
+### Open Graph e Twitter Card
+- `og:type`: website
+- `og:locale`: pt_BR
+- `og:image`: `/og-image.jpg` (1200x630 — adicionar imagem antes do go-live)
+- `twitter:card`: summary_large_image
+
+### GEO meta tags (SEO local)
+```html
+<meta name="geo.region" content="BR-MT" />
+<meta name="geo.placename" content="Cuiabá, Mato Grosso, Brasil" />
+<meta name="geo.position" content="-15.5934;-56.0883" />
+<meta name="ICBM" content="-15.5934, -56.0883" />
+```
+
+### Dados estruturados JSON-LD (`src/components/JsonLd.tsx`)
+
+| Schema | Finalidade |
+|---|---|
+| `LegalService` | Escritório: endereço, telefone, horário, coordenadas, área de atuação |
+| `Person` (Attorney) | Dr. Wagner Rocha: cargo, especialidades, contato |
+| `BreadcrumbList` | Breadcrumb nos resultados do Google |
+| `FAQPage` | Rich result com caixa de perguntas no Google (7 perguntas da copy) |
+
+### Sitemap e Robots
+- `/sitemap.xml` gerado dinamicamente — URL raiz (prioridade 1.0) e /obrigado (0.3)
+- `/robots.txt` gerado dinamicamente — permite tudo exceto `/api/`
+
+### Metadata por modelo
+Cada modelo tem `layout.tsx` próprio com `title` e `canonical` específicos. Necessário porque as páginas são Client Components (`'use client'`) e não podem exportar `metadata` diretamente.
+
+| Rota | Title |
+|---|---|
+| `/modelo-a` | Análise Gratuita do Seu Caso Trabalhista — Rocha Advogados |
+| `/modelo-b` | Direitos Trabalhistas em Cuiabá/MT — Rocha Advogados |
+| `/modelo-c` | Análise Gratuita do Seu Caso Trabalhista — Rocha Advogados |
+| `/modelo-d` | Direitos Trabalhistas em Cuiabá/MT — Rocha Advogados |
+
+### Pendência de SEO antes do go-live
+- Criar `/public/og-image.jpg` (1200x630 px) com identidade visual do escritório
+- Preencher `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` no Vercel após verificar no Google Search Console
+- Atualizar canonical do modelo escolhido para apontar para o domínio raiz (`https://rochaadvogadosmt.com.br`)
+
+---
+
 ## Variáveis de Ambiente
 
 Copiar `.env.local.example` para `.env.local` e preencher:
@@ -135,10 +200,16 @@ DATABASE_URL=postgresql://user:password@host.neon.tech/neondb?sslmode=require
 # Meta — Gerenciador de Eventos → Pixel → Configurações → Conversions API
 FB_PIXEL_ID=
 FB_ACCESS_TOKEN=
-NEXT_PUBLIC_FB_PIXEL_ID=   # mesmo valor do FB_PIXEL_ID
+NEXT_PUBLIC_FB_PIXEL_ID=       # mesmo valor do FB_PIXEL_ID
 
 # Google Analytics 4 — formato G-XXXXXXXXXX
 NEXT_PUBLIC_GA4_ID=
+
+# URL pública do site (sem barra final) — usado no SEO/sitemap/OG
+NEXT_PUBLIC_SITE_URL=https://rochaadvogadosmt.com.br
+
+# Google Search Console — código de verificação (opcional)
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=
 ```
 
 **No Vercel:** Project Settings → Environment Variables  
@@ -163,7 +234,7 @@ pnpm dev
 ### 3. Deploy Vercel
 ```bash
 # Conectar repo github.com/drtrafego/lp_wagner_rocha na Vercel
-# Adicionar as 5 variáveis de ambiente
+# Adicionar as variáveis de ambiente (ver seção acima)
 # Deploy automático a cada push na branch master
 ```
 
@@ -171,6 +242,12 @@ pnpm dev
 - Configurar o domínio do cliente para apontar para o modelo escolhido
 - Opção A: criar redirect na raiz `/` para `/modelo-x`
 - Opção B: copiar o conteúdo do modelo escolhido para `src/app/page.tsx`
+- Atualizar o `canonical` do modelo escolhido para `https://rochaadvogadosmt.com.br`
+
+### 5. Google Search Console
+- Adicionar propriedade com o domínio final
+- Obter o código de verificação e preencher `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` no Vercel
+- Submeter `https://rochaadvogadosmt.com.br/sitemap.xml`
 
 ---
 
@@ -182,6 +259,8 @@ pnpm dev
 | Advogado | Dr. Wagner Rocha |
 | Especialidade | Advocacia Trabalhista |
 | Endereço | Av. São Sebastião, 3161, Ed. Xingú, sala 103, Quilombo, Cuiabá/MT |
+| CEP | 78043-400 |
+| Coordenadas | -15.5934, -56.0883 |
 | Telefone | (65) 9 9676-8610 |
 | E-mail | wagner@rochaadvogadosmt.com |
 | WhatsApp deep link | wa.me/5565996768610 |
@@ -197,6 +276,8 @@ pnpm dev
 - [ ] Foto do Dr. Wagner (para inserir no hero se desejado)
 - [ ] Domínio final (para configurar no Vercel)
 - [ ] Credenciais: DATABASE_URL, FB_PIXEL_ID, FB_ACCESS_TOKEN, GA4_ID
+- [ ] Imagem OG (`/public/og-image.jpg`, 1200x630 px)
+- [ ] Verificação Google Search Console (`NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`)
 
 ---
 
