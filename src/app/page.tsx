@@ -37,22 +37,6 @@ export default function Home() {
         Seus direitos trabalhistas foram respeitados? Descubra antes que o prazo passe.
       </div>
 
-      {/* NAVBAR */}
-      <nav className="border-b border-chumbo/10 px-6 py-4 sticky top-0 bg-offwhite/95 backdrop-blur-sm z-50">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div>
-            <span className="font-display font-bold text-chumbo text-lg tracking-tight" style={{ fontFamily: 'Archivo, sans-serif' }}>Rocha Advogados</span>
-            <span className="ml-2 text-xs text-chumbo/40 font-body hidden sm:inline">Mato Grosso · Brasil</span>
-          </div>
-          <a
-            href="#formulario"
-            className="text-xs font-body bg-borde text-white px-4 py-2 hover:bg-borde-deep transition-colors"
-          >
-            Analisar meu caso
-          </a>
-        </div>
-      </nav>
-
       {/* HERO */}
       <section className="max-w-6xl mx-auto px-6 py-20 sm:py-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
