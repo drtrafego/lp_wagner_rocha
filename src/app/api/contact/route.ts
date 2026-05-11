@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getDb } from '@/lib/db'
 import { leads } from '@/lib/schema'
-import { sendMetaCAPI } from '@/lib/tracking-server'
+import { sendMetaCAPI, sendGA4MP, parseGaClientId, parseGaSessionId } from '@/lib/tracking-server'
 
 const ContactSchema = z.object({
   name: z.string().min(2, 'Nome muito curto').max(120),
@@ -12,6 +12,7 @@ const ContactSchema = z.object({
   utm_medium: z.string().optional(),
   utm_campaign: z.string().optional(),
   utm_term: z.string().optional(),
+  utm_content: z.string().optional(),
   modelo: z.string().optional(),
 })
 
@@ -42,17 +43,25 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     : (req.headers.get('x-real-ip') ?? undefined)
 
   const userAgent = req.headers.get('user-agent') ?? undefined
-
   const cookieHeader = req.headers.get('cookie') ?? ''
+
   const parseCookie = (name: string): string | undefined => {
     const match = cookieHeader.match(new RegExp(`(?:^|; )${name}=([^;]*)`))
     return match ? decodeURIComponent(match[1]) : undefined
   }
+
   const fbc = parseCookie('_fbc')
   const fbp = parseCookie('_fbp')
   const eventSourceUrl = req.headers.get('origin') ?? undefined
 
-  let leadId: number | string
+  const gaClientId = parseGaClientId(cookieHeader)
+  const measurementId = process.env.NEXT_PUBLIC_GA4_ID ?? ''
+  const gaSessionId = parseGaSessionId(cookieHeader, measurementId)
+
+  const organizationId = process.env.ORGANIZATION_ID!
+  const columnId = process.env.DEFAULT_COLUMN_ID!
+
+  let leadId: string
 
   try {
     const [row] = await withTimeout(
@@ -60,16 +69,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         name: input.name,
         email: input.email,
         whatsapp: input.whatsapp,
+        organization_id: organizationId,
+        column_id: columnId,
         utm_source: input.utm_source,
         utm_medium: input.utm_medium,
         utm_campaign: input.utm_campaign,
         utm_term: input.utm_term,
-        modelo: input.modelo,
+        utm_content: input.utm_content,
+        campaign_source: input.utm_source,
+        page_path: input.modelo ? `/modelo-${input.modelo}` : '/',
+        status: 'novo',
+        position: Date.now(),
       }).returning({ id: leads.id }),
       5_000,
     )
     leadId = row.id
-    console.log('[contact] Lead salvo:', leadId)
+    console.log('[contact] Lead salvo no CRM:', leadId)
   } catch (dbErr) {
     leadId = `fallback_${Date.now()}`
     console.error('[contact] Banco indisponível — fallback:', leadId, dbErr)
@@ -77,17 +92,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const response = NextResponse.json({ success: true, leadId }, { status: 200 })
 
-  void sendMetaCAPI({
-    leadId,
-    name: input.name,
-    email: input.email,
-    whatsapp: input.whatsapp,
-    ip,
-    userAgent,
-    fbc,
-    fbp,
-    eventSourceUrl,
-  }).catch((err) => console.error('[contact] Erro CAPI background:', err))
+  void Promise.all([
+    sendMetaCAPI({
+      leadId,
+      name: input.name,
+      email: input.email,
+      whatsapp: input.whatsapp,
+      modelo: input.modelo,
+      ip,
+      userAgent,
+      fbc,
+      fbp,
+      eventSourceUrl,
+    }),
+    sendGA4MP({
+      leadId,
+      modelo: input.modelo,
+      clientId: gaClientId,
+      sessionId: gaSessionId,
+      userAgent,
+      eventSourceUrl,
+    }),
+  ]).catch((err) => console.error('[contact] Erro tracking background:', err))
 
   return response
 }
