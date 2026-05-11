@@ -1,6 +1,7 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import PhoneInputWithFlag from '@/components/PhoneInputWithFlag'
 
 interface Props {
   variant?: 'light' | 'dark'
@@ -26,6 +27,8 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+  const [phone, setPhone] = useState('')
+  const [phoneValid, setPhoneValid] = useState(false)
 
   const isDark = variant === 'dark'
 
@@ -33,7 +36,9 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
     ? 'w-full bg-white/10 border border-white/20 text-white placeholder-white/40 rounded px-4 py-3 text-sm font-body focus:outline-none focus:border-borde transition-colors'
     : 'w-full bg-white border border-chumbo/20 text-chumbo placeholder-chumbo/40 rounded px-4 py-3 text-sm font-body focus:outline-none focus:border-borde transition-colors'
 
-  const labelClass = isDark ? 'block text-xs font-body font-medium text-white/60 mb-1 uppercase tracking-wider' : 'block text-xs font-body font-medium text-chumbo/60 mb-1 uppercase tracking-wider'
+  const labelClass = isDark
+    ? 'block text-xs font-body font-medium text-white/60 mb-1 uppercase tracking-wider'
+    : 'block text-xs font-body font-medium text-chumbo/60 mb-1 uppercase tracking-wider'
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -45,11 +50,12 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
     const data = {
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
       email: (form.elements.namedItem('email') as HTMLInputElement).value,
-      whatsapp: (form.elements.namedItem('whatsapp') as HTMLInputElement).value,
+      whatsapp: phone,
       utm_source: getUTM('utm_source'),
       utm_medium: getUTM('utm_medium'),
       utm_campaign: getUTM('utm_campaign'),
       utm_term: getUTM('utm_term'),
+      utm_content: getUTM('utm_content'),
       modelo,
     }
 
@@ -76,12 +82,10 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
       const json = await res.json()
       const leadId = String(json.leadId)
 
-      // Pixel Meta — evento Lead
       if (typeof window.fbq === 'function') {
         window.fbq('track', 'Lead', {}, { eventID: leadId })
       }
 
-      // GA4 — evento generate_lead
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'generate_lead', { event_category: 'formulario', modelo })
       }
@@ -123,14 +127,11 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
         </div>
 
         <div>
-          <label htmlFor="whatsapp" className={labelClass}>WhatsApp</label>
-          <input
-            type="tel"
-            id="whatsapp"
-            name="whatsapp"
-            placeholder="(65) 9 9999-9999"
-            required
-            className={inputBase}
+          <label className={labelClass}>WhatsApp</label>
+          <PhoneInputWithFlag
+            value={phone}
+            onChange={(val, valid) => { setPhone(val); setPhoneValid(valid) }}
+            variant={variant}
           />
           {fieldErrors.whatsapp && <p className="text-red-400 text-xs mt-1">{fieldErrors.whatsapp[0]}</p>}
         </div>
