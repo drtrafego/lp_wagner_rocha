@@ -82,7 +82,7 @@ export default function ModeloC() {
               <div className="flex flex-wrap gap-10 mb-10">
                 <div>
                   <div className="font-display font-bold text-borde text-4xl" style={{ fontFamily: 'Archivo, sans-serif' }}>
-                    <CountUp target={13} suffix="" />
+                    <CountUp target={12} suffix="" />
                   </div>
                   <div className="text-chumbo/50 font-body text-xs mt-1">anos de advocacia trabalhista</div>
                 </div>
@@ -227,7 +227,7 @@ export default function ModeloC() {
               <h2 className="font-display font-bold text-chumbo text-2xl sm:text-3xl mb-3" style={{ fontFamily: 'Archivo, sans-serif' }}>
                 Experiência que faz diferença na análise do seu caso
               </h2>
-              <p className="text-chumbo/60 font-body text-base">13 anos de advocacia trabalhista — atuando dos dois lados da relação de trabalho.</p>
+              <p className="text-chumbo/60 font-body text-base">Mais de 12 anos de advocacia trabalhista — atuando dos dois lados da relação de trabalho.</p>
             </div>
           </ScrollReveal>
 
@@ -275,7 +275,7 @@ export default function ModeloC() {
               <div className="grid grid-cols-2 gap-8 mb-8">
                 <div>
                   <div className="font-display font-bold text-borde text-4xl" style={{ fontFamily: 'Archivo, sans-serif' }}>
-                    <CountUp target={13} />
+                    <CountUp target={12} />
                   </div>
                   <div className="text-chumbo/50 font-body text-xs mt-1">anos de atuação</div>
                 </div>
@@ -286,7 +286,7 @@ export default function ModeloC() {
               </div>
               <ul className="space-y-3 text-sm font-body text-chumbo/70">
                 {[
-                  '13 anos de atuação contínua em advocacia trabalhista',
+                  'Mais de 12 anos de atuação contínua em advocacia trabalhista',
                   'Experiência representando empregados e empregadores',
                   'Especialização em Direito e Processo do Trabalho',
                   'Cada caso analisado de forma própria, não em série',
