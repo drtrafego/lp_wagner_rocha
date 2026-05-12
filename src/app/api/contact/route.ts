@@ -87,7 +87,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     console.log('[contact] Lead salvo no CRM:', leadId)
   } catch (dbErr) {
     leadId = `fallback_${Date.now()}`
+    const errMsg = dbErr instanceof Error ? dbErr.message : String(dbErr)
     console.error('[contact] Banco indisponível — fallback:', leadId, dbErr)
+    return NextResponse.json({ success: false, leadId, dbError: errMsg }, { status: 200 })
   }
 
   const response = NextResponse.json({ success: true, leadId }, { status: 200 })
