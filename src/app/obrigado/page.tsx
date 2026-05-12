@@ -38,7 +38,7 @@ function ObrigadoContent() {
         </h1>
 
         <p className="text-chumbo/60 font-body text-base leading-relaxed mb-8">
-          O Dr. Wagner Rocha vai analisar o seu caso e entrar em contato em breve pelo WhatsApp ou e-mail informado.
+          O Dr. Wagner Rocha vai analisar o seu caso e entrar em contato em breve pelo WhatsApp informado.
         </p>
 
         <div className="bg-offwhite-quente rounded-lg p-6 mb-8 text-left">

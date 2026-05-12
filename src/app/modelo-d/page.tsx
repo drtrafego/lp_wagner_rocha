@@ -188,7 +188,7 @@ export default function ModeloD() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <ScrollReveal type="left">
               <div>
-                <p className="text-borde text-xs uppercase tracking-[0.2em] font-body mb-3">O que fazemos</p>
+                <p className="text-borde-light font-bold text-xs uppercase tracking-[0.2em] font-body mb-3">O que fazemos</p>
                 <h2 className="font-display font-bold text-offwhite text-2xl sm:text-3xl mb-6 leading-tight" style={{ fontFamily: 'Archivo, sans-serif' }}>
                   Uma análise completa da sua situação trabalhista
                 </h2>

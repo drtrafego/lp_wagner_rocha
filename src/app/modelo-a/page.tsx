@@ -134,7 +134,7 @@ export default function ModeloA() {
       <section className="bg-chumbo py-16 sm:py-24">
         <div className="max-w-6xl mx-auto px-6">
           <div className="mb-12">
-            <p className="text-borde text-xs uppercase tracking-[0.2em] font-body mb-3">O que fazemos</p>
+            <p className="text-borde-light font-bold text-xs uppercase tracking-[0.2em] font-body mb-3">O que fazemos</p>
             <h2 className="font-display font-bold text-offwhite text-2xl sm:text-3xl mb-4" style={{ fontFamily: 'Archivo, sans-serif' }}>
               Uma análise completa da sua situação trabalhista
             </h2>
