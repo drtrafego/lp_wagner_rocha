@@ -38,62 +38,47 @@ export default function Home() {
       </div>
 
       {/* HERO */}
-      <section className="max-w-6xl mx-auto px-6 py-20 sm:py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          <div>
-            <ScrollReveal type="up">
-              <h1 className="font-display font-extrabold text-chumbo leading-[1.05] mb-6" style={{ fontFamily: 'Archivo, sans-serif', fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
-                O que você não sabe sobre seus direitos trabalhistas,{' '}
-                <em className="not-italic text-borde">pode custar mais do que imagina.</em>
-              </h1>
-            </ScrollReveal>
+      <section className="max-w-4xl mx-auto px-6 py-20 sm:py-32 text-center">
+        <ScrollReveal type="up">
+          <h1 className="font-display font-extrabold text-chumbo leading-[1.05] mb-6" style={{ fontFamily: 'Archivo, sans-serif', fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
+            O que você não sabe sobre seus direitos trabalhistas,{' '}
+            <em className="not-italic text-borde">pode custar mais do que imagina.</em>
+          </h1>
+        </ScrollReveal>
 
-            <ScrollReveal type="up" delay={0.1}>
-              <p className="text-chumbo/60 font-body text-base leading-relaxed mb-10 max-w-md">
-                Rescisão calculada errada, horas extras não pagas, FGTS sem depósito: há prazos correndo. Uma análise do seu caso pode mudar o que você ainda consegue reivindicar.
-              </p>
-            </ScrollReveal>
+        <ScrollReveal type="up" delay={0.1}>
+          <p className="text-chumbo/60 font-body text-base leading-relaxed mb-10 max-w-xl mx-auto">
+            Rescisão calculada errada, horas extras não pagas, FGTS sem depósito: há prazos correndo. Uma análise do seu caso pode mudar o que você ainda consegue reivindicar.
+          </p>
+        </ScrollReveal>
 
-            {/* STATS ANIMADOS */}
-            <ScrollReveal type="up" delay={0.2}>
-              <div className="flex flex-wrap gap-10 mb-10">
-                <div>
-                  <div className="font-display font-bold text-borde text-4xl" style={{ fontFamily: 'Archivo, sans-serif' }}>
-                    <CountUp target={12} suffix="" />
-                  </div>
-                  <div className="text-chumbo/50 font-body text-xs mt-1">anos de advocacia trabalhista</div>
-                </div>
-                <div>
-                  <div className="font-display font-bold text-borde text-4xl" style={{ fontFamily: 'Archivo, sans-serif' }}>
-                    +<CountUp target={1500} />
-                  </div>
-                  <div className="text-chumbo/50 font-body text-xs mt-1">atuações processuais</div>
-                </div>
+        {/* STATS ANIMADOS */}
+        <ScrollReveal type="up" delay={0.2}>
+          <div className="flex flex-wrap justify-center gap-12 mb-10">
+            <div>
+              <div className="font-display font-bold text-borde text-4xl" style={{ fontFamily: 'Archivo, sans-serif' }}>
+                <CountUp target={12} suffix="" />
               </div>
-            </ScrollReveal>
-
-            <ScrollReveal type="up" delay={0.25}>
-              <a
-                href="#formulario"
-                className="inline-block bg-borde hover:bg-borde-deep text-white font-display font-bold py-4 px-8 text-sm uppercase tracking-widest transition-colors"
-                style={{ fontFamily: 'Archivo, sans-serif' }}
-              >
-                Analisar meu caso
-              </a>
-            </ScrollReveal>
-          </div>
-
-          {/* FORMULÁRIO */}
-          <ScrollReveal type="scale" delay={0.15}>
-            <div id="formulario" className="bg-white rounded-2xl shadow-xl shadow-chumbo/10 p-8 border border-chumbo/5 sticky top-24">
-              <h2 className="font-display font-bold text-chumbo text-lg mb-1" style={{ fontFamily: 'Archivo, sans-serif' }}>
-                Análise gratuita do seu caso
-              </h2>
-              <p className="text-chumbo/50 font-body text-sm mb-6">Sem compromisso. O Dr. Wagner responde em até 24h.</p>
-              <ContactForm variant="light" modelo="home" />
+              <div className="text-chumbo/50 font-body text-xs mt-1">anos de advocacia trabalhista</div>
             </div>
-          </ScrollReveal>
-        </div>
+            <div>
+              <div className="font-display font-bold text-borde text-4xl" style={{ fontFamily: 'Archivo, sans-serif' }}>
+                +<CountUp target={1500} />
+              </div>
+              <div className="text-chumbo/50 font-body text-xs mt-1">atuações processuais</div>
+            </div>
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal type="up" delay={0.25}>
+          <a
+            href="#formulario"
+            className="inline-block bg-borde hover:bg-borde-deep text-white font-display font-bold py-4 px-8 text-sm uppercase tracking-widest transition-colors"
+            style={{ fontFamily: 'Archivo, sans-serif' }}
+          >
+            Analisar meu caso
+          </a>
+        </ScrollReveal>
       </section>
 
       {/* LINHA BORDÔ DECORATIVA */}
@@ -297,7 +282,7 @@ export default function Home() {
       </section>
 
       {/* CTA FINAL */}
-      <section className="bg-borde py-16 sm:py-24">
+      <section id="formulario" className="bg-borde py-16 sm:py-24">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <ScrollReveal type="scale">
             <h2 className="font-display font-bold text-white text-2xl sm:text-4xl mb-4" style={{ fontFamily: 'Archivo, sans-serif' }}>
