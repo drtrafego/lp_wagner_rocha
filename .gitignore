@@ -29,3 +29,6 @@ yarn-error.log*
 Thumbs.db
 
 .vercel
+.claude/
+.playwright-mcp/
+DOC_API_BACKEND.md
