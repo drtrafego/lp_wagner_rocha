@@ -65,9 +65,9 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="font-display font-bold text-borde text-4xl" style={{ fontFamily: 'Archivo, sans-serif' }}>
-                    R$<CountUp target={0} />
+                    +<CountUp target={1500} />
                   </div>
-                  <div className="text-chumbo/50 font-body text-xs mt-1">custo para começar</div>
+                  <div className="text-chumbo/50 font-body text-xs mt-1">atuações processuais</div>
                 </div>
               </div>
             </ScrollReveal>
