@@ -1,5 +1,8 @@
 'use client'
-import { useEffect, Suspense } from 'react'
+import { useEffect, useState, Suspense } from 'react'
+
+const WA_URL =
+  'https://wa.me/5565996768610?text=Ol%C3%A1%20Dr.%20Wagner%2C%20acabei%20de%20preencher%20o%20formul%C3%A1rio%20e%20gostaria%20de%20saber%20mais%20sobre%20a%20an%C3%A1lise%20do%20meu%20caso.'
 
 declare global {
   interface Window {
@@ -9,10 +12,25 @@ declare global {
 }
 
 function ObrigadoContent() {
+  const [segundos, setSegundos] = useState(3)
+
   useEffect(() => {
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'conversion', { event_category: 'lead', value: 1 })
     }
+
+    const intervalo = setInterval(() => {
+      setSegundos((s) => {
+        if (s <= 1) {
+          clearInterval(intervalo)
+          window.location.href = WA_URL
+          return 0
+        }
+        return s - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(intervalo)
   }, [])
 
   return (
@@ -56,14 +74,15 @@ function ObrigadoContent() {
         </div>
 
         <a
-          href="https://wa.me/5565996768610?text=Olá%20Dr.%20Wagner%2C%20acabei%20de%20preencher%20o%20formulário%20e%20gostaria%20de%20saber%20mais%20sobre%20a%20análise%20do%20meu%20caso."
-          target="_blank"
-          rel="noopener noreferrer"
+          href={WA_URL}
           className="inline-block bg-borde hover:bg-borde-deep text-white font-display font-bold py-4 px-8 rounded text-sm uppercase tracking-widest transition-colors"
         >
           Falar pelo WhatsApp agora
         </a>
 
+        <p className="text-chumbo/40 text-xs font-body mt-6">
+          Redirecionando para o WhatsApp em {segundos}s...
+        </p>
       </div>
     </main>
   )
