@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 
 declare global {
   interface Window {
@@ -10,9 +9,6 @@ declare global {
 }
 
 function ObrigadoContent() {
-  const params = useSearchParams()
-  const leadId = params.get('lead') ?? ''
-
   useEffect(() => {
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'conversion', { event_category: 'lead', value: 1 })
@@ -68,9 +64,6 @@ function ObrigadoContent() {
           Falar pelo WhatsApp agora
         </a>
 
-        <p className="text-chumbo/30 text-xs font-body mt-6">
-          Ref. {leadId || 'sua solicitação'} — Rocha Advogados, Cuiabá/MT
-        </p>
       </div>
     </main>
   )
