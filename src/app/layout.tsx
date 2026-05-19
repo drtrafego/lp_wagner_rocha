@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import MetaPixel from '@/components/MetaPixel'
-import GoogleAnalytics from '@/components/GoogleAnalytics'
 import JsonLd from '@/components/JsonLd'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://rochaadvogadosmt.com.br'
@@ -95,7 +94,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MDG98V62" height="0" width="0" style={{ display: 'none', visibility: 'hidden' }}></iframe></noscript>
         <MetaPixel />
-        <GoogleAnalytics />
         {children}
       </body>
     </html>
