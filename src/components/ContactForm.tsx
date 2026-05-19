@@ -23,6 +23,19 @@ function getUTM(param: string): string {
   return new URLSearchParams(window.location.search).get(param) ?? ''
 }
 
+function getGaClientId(): string | undefined {
+  if (typeof document === 'undefined') return undefined
+  const match = document.cookie.match(/_ga=GA\d+\.\d+\.(\d+\.\d+)/)
+  return match ? match[1] : undefined
+}
+
+function getGaSessionId(measurementId: string): string | undefined {
+  if (typeof document === 'undefined') return undefined
+  const containerId = measurementId.replace('G-', '')
+  const match = document.cookie.match(new RegExp(`_ga_${containerId}=GS[^;]*?\\.(\\d+)\\.`))
+  return match ? match[1] : undefined
+}
+
 export default function ContactForm({ variant = 'light', modelo = 'a', className = '', ctaLabel }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -48,6 +61,7 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
     setFieldErrors({})
 
     const form = e.currentTarget
+    const measurementId = process.env.NEXT_PUBLIC_GA4_ID ?? ''
     const data = {
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
       email: (form.elements.namedItem('email') as HTMLInputElement).value,
@@ -58,6 +72,8 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
       utm_term: getUTM('utm_term'),
       utm_content: getUTM('utm_content'),
       modelo,
+      ga_client_id: getGaClientId(),
+      ga_session_id: getGaSessionId(measurementId),
     }
 
     try {

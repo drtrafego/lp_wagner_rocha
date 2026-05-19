@@ -14,6 +14,8 @@ const ContactSchema = z.object({
   utm_term: z.string().optional(),
   utm_content: z.string().optional(),
   modelo: z.string().optional(),
+  ga_client_id: z.string().optional(),
+  ga_session_id: z.string().optional(),
 })
 
 type ContactInput = z.infer<typeof ContactSchema>
@@ -54,9 +56,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const fbp = parseCookie('_fbp')
   const eventSourceUrl = req.headers.get('origin') ?? undefined
 
-  const gaClientId = parseGaClientId(cookieHeader)
   const measurementId = process.env.NEXT_PUBLIC_GA4_ID ?? ''
-  const gaSessionId = parseGaSessionId(cookieHeader, measurementId)
+  // Prioriza client_id enviado pelo cliente (mais confiável que leitura de cookie no servidor)
+  const gaClientId = input.ga_client_id ?? parseGaClientId(cookieHeader)
+  const gaSessionId = input.ga_session_id ?? parseGaSessionId(cookieHeader, measurementId)
+  console.log('[GA4] client_id:', gaClientId ?? 'sintético')
 
   const organizationId = process.env.ORGANIZATION_ID!
   const columnId = process.env.DEFAULT_COLUMN_ID!
