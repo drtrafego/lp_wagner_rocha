@@ -86,11 +86,20 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
         window.fbq('track', 'Lead', {}, { eventID: leadId })
       }
 
-      if (typeof window.gtag === 'function') {
-        window.gtag('event', 'generate_lead', { event_category: 'formulario', modelo })
-      }
+      const redirect = () => router.push(`/obrigado?lead=${leadId}`)
 
-      router.push(`/obrigado?lead=${leadId}`)
+      if (typeof window.gtag === 'function') {
+        let done = false
+        const go = () => { if (!done) { done = true; redirect() } }
+        window.gtag('event', 'generate_lead', {
+          event_category: 'formulario',
+          modelo,
+          event_callback: go,
+        })
+        setTimeout(go, 1500)
+      } else {
+        redirect()
+      }
     } catch {
       setError('Ocorreu um erro. Tente novamente.')
       setLoading(false)
