@@ -7,7 +7,7 @@ const WA_URL =
 declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void
-    gtag?: (...args: unknown[]) => void
+    dataLayer?: Record<string, unknown>[]
   }
 }
 
@@ -15,9 +15,8 @@ function ObrigadoContent() {
   const [segundos, setSegundos] = useState(3)
 
   useEffect(() => {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'conversion', { event_category: 'lead', value: 1 })
-    }
+    window.dataLayer = window.dataLayer ?? []
+    window.dataLayer.push({ event: 'conversion', event_category: 'lead', value: 1 })
 
     const intervalo = setInterval(() => {
       setSegundos((s) => {

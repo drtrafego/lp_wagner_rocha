@@ -29,32 +29,42 @@ test('diagnóstico completo do tracking', async ({ page }) => {
   await page.waitForSelector('input[type="tel"]', { timeout: 5000 })
   await page.fill('input[type="tel"]', '65988881111')
 
-  // Aguarda o request do generate_lead explicitamente ANTES do redirect
-  const generateLeadReq = page.waitForRequest(
-    (req) => req.url().includes('google-analytics.com/g/collect') && req.url().includes('en=generate_lead'),
-    { timeout: 5000 }
-  ).catch(() => null)
+  // Monitora o dataLayer em tempo real via exposeFunction
+  const dataLayerEvents: unknown[] = []
+  await page.exposeFunction('__captureDataLayer', (e: unknown) => dataLayerEvents.push(e))
+
+  // Intercepta pushes ao dataLayer antes do submit
+  await page.evaluate(() => {
+    const w = window as unknown as { dataLayer?: unknown[]; __captureDataLayer: (e: unknown) => void }
+    w.dataLayer = w.dataLayer ?? []
+    const original = w.dataLayer.push.bind(w.dataLayer)
+    w.dataLayer.push = (...args: unknown[]) => {
+      args.forEach((a) => w.__captureDataLayer(a))
+      return original(...args)
+    }
+  })
 
   await page.click('button[type="submit"]', { force: true })
 
-  // Espera o evento OU o redirect (o que vier primeiro)
-  const [capturedReq] = await Promise.all([
-    generateLeadReq,
-    page.waitForURL('**/obrigado**', { timeout: 10000 }).catch(() => null),
-  ])
+  // Aguarda a navegação para /obrigado
+  await page.waitForURL('**/obrigado**', { timeout: 10000 }).catch(() => null)
 
-  // Aguarda mais 500ms para capturar eventos que chegam logo após
+  // Aguarda mais 500ms para eventos tardios
   await page.waitForTimeout(500)
 
+  const generateLeadEvent = dataLayerEvents.find(
+    (e) => e && typeof e === 'object' && (e as Record<string, unknown>)['event'] === 'generate_lead'
+  )
+
   console.log('\n=== RESULTADO ===')
-  console.log('[generate_lead capturado antes do redirect?]', capturedReq ? 'SIM' : 'NÃO')
-  if (capturedReq) {
-    const params = new URL(capturedReq.url()).searchParams
-    console.log('[en]', params.get('en'))
-    console.log('[tid]', params.get('tid'))
-    console.log('[cid]', params.get('cid'))
-    console.log('[URL parcial]', capturedReq.url().substring(0, 200))
-  }
+  console.log('[generate_lead no dataLayer?]', generateLeadEvent ? 'SIM' : 'NÃO')
+  if (generateLeadEvent) console.log('[evento]', JSON.stringify(generateLeadEvent))
+  console.log('[todos os eventos dataLayer capturados]')
+  dataLayerEvents.forEach((e) => {
+    if (e && typeof e === 'object' && 'event' in (e as object)) {
+      console.log(' ', (e as Record<string, unknown>)['event'])
+    }
+  })
 
   console.log('\n=== TODOS OS EVENTOS GA4 CAPTURADOS ===')
   ga4Events.forEach((e) => console.log(`  en=${e.en}`))

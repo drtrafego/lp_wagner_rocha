@@ -14,6 +14,7 @@ declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void
     gtag?: (...args: unknown[]) => void
+    dataLayer?: Record<string, unknown>[]
   }
 }
 
@@ -86,20 +87,12 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
         window.fbq('track', 'Lead', {}, { eventID: leadId })
       }
 
-      const redirect = () => router.push(`/obrigado?lead=${leadId}`)
+      // Empurra para o dataLayer do GTM (padrão correto para GTM gerenciar)
+      window.dataLayer = window.dataLayer ?? []
+      window.dataLayer.push({ event: 'generate_lead', event_category: 'formulario', modelo, lead_id: leadId })
 
-      if (typeof window.gtag === 'function') {
-        let done = false
-        const go = () => { if (!done) { done = true; redirect() } }
-        window.gtag('event', 'generate_lead', {
-          event_category: 'formulario',
-          modelo,
-          event_callback: go,
-        })
-        setTimeout(go, 1500)
-      } else {
-        redirect()
-      }
+      // Aguarda GTM processar antes de redirecionar
+      setTimeout(() => router.push(`/obrigado?lead=${leadId}`), 300)
     } catch {
       setError('Ocorreu um erro. Tente novamente.')
       setLoading(false)
