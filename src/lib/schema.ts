@@ -10,6 +10,7 @@ export const leads = pgTable('leads', {
   organization_id: text('organization_id').notNull(),
   column_id: uuid('column_id').notNull(),
   position: integer('position').default(0),
+  created_via: text('created_via'),
   notes: text('notes'),
   value: numeric('value'),
   utm_source: text('utm_source'),

@@ -56,6 +56,7 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    if (loading) return
     setLoading(true)
     setError(null)
     setFieldErrors({})

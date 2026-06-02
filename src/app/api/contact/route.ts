@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { waitUntil } from '@vercel/functions'
+import { and, eq, gte } from 'drizzle-orm'
 import { z } from 'zod'
 import { getDb } from '@/lib/db'
 import { leads } from '@/lib/schema'
@@ -68,27 +70,50 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   let leadId: string
 
   try {
-    const [row] = await withTimeout(
-      getDb().insert(leads).values({
-        name: input.name,
-        email: input.email,
-        whatsapp: input.whatsapp,
-        organization_id: organizationId,
-        column_id: columnId,
-        utm_source: input.utm_source,
-        utm_medium: input.utm_medium,
-        utm_campaign: input.utm_campaign,
-        utm_term: input.utm_term,
-        utm_content: input.utm_content,
-        campaign_source: input.utm_source,
-        page_path: input.modelo ? `/modelo-${input.modelo}` : '/',
-        status: 'novo',
-        position: Math.floor(Date.now() / 1000),
-      }).returning({ id: leads.id }),
+    // Dedup: mesmo whatsapp na mesma org nos ultimos 5 minutos reutiliza lead existente.
+    // Janela curta porque mesmo cliente voltando dias depois e interesse novo legitimo.
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
+    const existing = await withTimeout(
+      getDb()
+        .select({ id: leads.id })
+        .from(leads)
+        .where(
+          and(
+            eq(leads.organization_id, organizationId),
+            eq(leads.whatsapp, input.whatsapp),
+            gte(leads.created_at, fiveMinutesAgo),
+          ),
+        )
+        .limit(1),
       5_000,
     )
-    leadId = row.id
-    console.log('[contact] Lead salvo no CRM:', leadId)
+
+    if (existing.length > 0) {
+      leadId = existing[0].id
+      console.log('[contact] Lead duplicado em janela curta, reutilizando:', leadId)
+    } else {
+      const [row] = await withTimeout(
+        getDb().insert(leads).values({
+          name: input.name,
+          email: input.email,
+          whatsapp: input.whatsapp,
+          organization_id: organizationId,
+          column_id: columnId,
+          utm_source: input.utm_source,
+          utm_medium: input.utm_medium,
+          utm_campaign: input.utm_campaign,
+          utm_term: input.utm_term,
+          utm_content: input.utm_content,
+          campaign_source: input.utm_source,
+          page_path: input.modelo ? `/modelo-${input.modelo}` : '/',
+          status: 'novo',
+          created_via: 'site_api',
+        }).returning({ id: leads.id }),
+        5_000,
+      )
+      leadId = row.id
+      console.log('[contact] Lead salvo no CRM:', leadId)
+    }
   } catch (dbErr) {
     leadId = `fallback_${Date.now()}`
     console.error('[contact] Banco indisponível — fallback:', leadId, dbErr)
@@ -96,7 +121,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const response = NextResponse.json({ success: true, leadId }, { status: 200 })
 
-  void Promise.all([
+  waitUntil(Promise.all([
     sendMetaCAPI({
       leadId,
       name: input.name,
@@ -117,7 +142,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       userAgent,
       eventSourceUrl,
     }),
-  ]).catch((err) => console.error('[contact] Erro tracking background:', err))
+  ]).catch((err) => console.error('[contact] Erro tracking background:', err)))
 
   return response
 }
