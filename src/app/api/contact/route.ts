@@ -4,7 +4,13 @@ import { and, eq, gte } from 'drizzle-orm'
 import { z } from 'zod'
 import { getDb } from '@/lib/db'
 import { leads } from '@/lib/schema'
-import { sendMetaCAPI, sendGA4MP, parseGaClientId, parseGaSessionId } from '@/lib/tracking-server'
+import {
+  parseRequestContext,
+  sendMetaCAPI,
+  sendGA4Event,
+  parseGaClientId,
+  parseGaSessionId,
+} from '@/lib/tracking-server'
 
 const ContactSchema = z.object({
   name: z.string().min(2, 'Nome muito curto').max(120),
@@ -18,6 +24,7 @@ const ContactSchema = z.object({
   modelo: z.string().optional(),
   ga_client_id: z.string().optional(),
   ga_session_id: z.string().optional(),
+  test_event_code: z.string().optional(),
 })
 
 type ContactInput = z.infer<typeof ContactSchema>
@@ -41,28 +48,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ success: false, message: 'Payload inválido' }, { status: 400 })
   }
 
-  const xForwardedFor = req.headers.get('x-forwarded-for')
-  const ip = xForwardedFor
-    ? xForwardedFor.split(',')[0].trim()
-    : (req.headers.get('x-real-ip') ?? undefined)
+  const context = parseRequestContext(req)
 
-  const userAgent = req.headers.get('user-agent') ?? undefined
   const cookieHeader = req.headers.get('cookie') ?? ''
-
-  const parseCookie = (name: string): string | undefined => {
-    const match = cookieHeader.match(new RegExp(`(?:^|; )${name}=([^;]*)`))
-    return match ? decodeURIComponent(match[1]) : undefined
-  }
-
-  const fbc = parseCookie('_fbc')
-  const fbp = parseCookie('_fbp')
-  const eventSourceUrl = req.headers.get('origin') ?? undefined
-
-  const measurementId = process.env.NEXT_PUBLIC_GA4_ID ?? ''
-  // Prioriza client_id enviado pelo cliente (mais confiável que leitura de cookie no servidor)
+  const measurementId =
+    process.env.GA_MEASUREMENT_ID ||
+    process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ||
+    process.env.NEXT_PUBLIC_GA4_ID ||
+    ''
   const gaClientId = input.ga_client_id ?? parseGaClientId(cookieHeader)
-  const gaSessionId = input.ga_session_id ?? parseGaSessionId(cookieHeader, measurementId)
-  console.log('[GA4] client_id:', gaClientId ?? 'sintético')
+  const gaSessionId = measurementId
+    ? (input.ga_session_id ?? parseGaSessionId(cookieHeader, measurementId))
+    : input.ga_session_id
 
   const organizationId = process.env.ORGANIZATION_ID!
   const columnId = process.env.DEFAULT_COLUMN_ID!
@@ -99,6 +96,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           whatsapp: input.whatsapp,
           organization_id: organizationId,
           column_id: columnId,
+          position: Math.floor(Date.now() / 1000),
           utm_source: input.utm_source,
           utm_medium: input.utm_medium,
           utm_campaign: input.utm_campaign,
@@ -121,26 +119,38 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const response = NextResponse.json({ success: true, leadId }, { status: 200 })
 
-  waitUntil(Promise.all([
+  waitUntil(Promise.allSettled([
     sendMetaCAPI({
-      leadId,
-      name: input.name,
-      email: input.email,
-      whatsapp: input.whatsapp,
-      modelo: input.modelo,
-      ip,
-      userAgent,
-      fbc,
-      fbp,
-      eventSourceUrl,
+      eventName: 'Lead',
+      eventId: leadId,
+      context,
+      userExtras: {
+        email: input.email,
+        phone: input.whatsapp,
+        firstName: input.name,
+        city: context.city,
+        state: context.state,
+        zip: context.zip,
+      },
+      customData: {
+        content_name: 'Lead Rocha Advogados',
+        lead_type: input.modelo ? `modelo-${input.modelo}` : 'landing-page',
+        currency: 'BRL',
+      },
+      testEventCode: input.test_event_code,
     }),
-    sendGA4MP({
-      leadId,
-      modelo: input.modelo,
+    sendGA4Event({
+      eventName: 'generate_lead',
       clientId: gaClientId,
+      gaCookie: context.gaCookie,
       sessionId: gaSessionId,
-      userAgent,
-      eventSourceUrl,
+      ip: context.ip,
+      userAgent: context.userAgent,
+      params: {
+        currency: 'BRL',
+        lead_id: leadId,
+        lead_source: input.modelo ? `modelo-${input.modelo}` : 'landing-page',
+      },
     }),
   ]).catch((err) => console.error('[contact] Erro tracking background:', err)))
 

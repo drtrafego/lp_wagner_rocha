@@ -745,4 +745,61 @@ Nenhuma biblioteca de terceiros alem das listadas. Zero dependencias extras para
 
 *Documento gerado em 2026-05-12 — DR.TRAFEGO*
 *Atualizado em 2026-05-19 — ajustes de tracking GTM/GA4 (ga_client_id no body, remocao de GoogleAnalytics.tsx, dataLayer.push para eventos client-side)*
+*Atualizado em 2026-06-08 — migracao para SDK oficial Meta `capi-param-builder-nodejs` (ParamBuilder) + middleware com cookie `_eid` + endpoints `/api/track`, `/api/track-config`, `/api/debug-payload` + componente `TrackPageView` para PageView com eventID compartilhado entre Pixel e CAPI*
 *Baseado na implementacao real do projeto lp_wagner_rocha*
+
+---
+
+## 13. Atualizacao 2026-06-08: Padrao DR.TRAFEGO Tracking Perfeito
+
+A partir desta data o projeto migrou para a arquitetura de tracking de referencia (mesma do `lp_charcutaria`). Mudancas principais:
+
+### 13.1 Dependencia nova
+```bash
+pnpm add capi-param-builder-nodejs
+```
+
+### 13.2 Arquivos novos
+- `src/middleware.ts` gera cookie `_eid` (UUID estavel, usado como `external_id` em TODOS os eventos) e captura `gclid/wbraid/gbraid` em cookies `_gcl_*`. NAO mexe em `_fbc/_fbp` (responsabilidade do SDK Meta).
+- `src/lib/tracking-schema.ts` Zod schemas centralizados (`StandardEvents = ['PageView', 'Lead', 'Contact']`).
+- `src/app/api/track/route.ts` endpoint generico para PageView/Lead/Contact disparados pelo client.
+- `src/app/api/track-config/route.ts` expoe `pixelId` e `gtagId` publicamente para scripts dinamicos.
+- `src/app/api/debug-payload/route.ts` retorna payload pronto para colar no Payload Helper Meta.
+- `src/components/TrackPageView.tsx` dispara PageView com eventID compartilhado entre Pixel browser e CAPI server.
+
+### 13.3 Arquivos alterados
+- `src/lib/tracking-server.ts` reescrito com `ParamBuilder` do SDK Meta + `parseRequestContext()` unificado + `buildUserData()` com hash via SDK (normalizacao oficial) + `sendGA4Event()` substituindo `sendGA4MP()`. Aceita ambos os nomes de env (`GA_API_SECRET` ou legado `GA4_API_SECRET`, idem measurement id).
+- `src/app/api/contact/route.ts` usa `parseRequestContext(req)` no inicio; `external_id` da CAPI = cookie `_eid` (anonimo, stitching com PageView), `event_id` da CAPI Lead = `leadId` UUID (dedup com Pixel browser). Repassa `test_event_code` para teste em Test Events Manager.
+- `src/app/layout.tsx` Pixel base inline no `<head>` (sem `fbq('track', 'PageView')` no snippet, o `TrackPageView` faz isso com eventID). Adiciona `<TrackPageView />` no body.
+- `src/components/ContactForm.tsx` agora envia `test_event_code` no body quando presente em `?test_event_code=...` ou em `sessionStorage._tec`.
+- `src/components/MetaPixel.tsx` REMOVIDO. Substituido pelo snippet inline + `TrackPageView`.
+
+### 13.4 Variaveis de ambiente novas
+```bash
+TRACKING_ETLD_DOMAIN=rochaadvogadosmt.com
+TRACKING_DOMAINS=rochaadvogadosmt.com,www.rochaadvogadosmt.com,rochaadvogadosmt.com.br,www.rochaadvogadosmt.com.br,localhost
+# Opcional (novos nomes, fallback automatico para os antigos):
+GA_MEASUREMENT_ID=G-G78B3XD7KG          # ou NEXT_PUBLIC_GA_MEASUREMENT_ID (publico)
+GA_API_SECRET=XXXXXXXX                  # legado: GA4_API_SECRET
+```
+
+### 13.5 Mapa de eventos
+| Frente | PageView | Lead | Contact |
+|---|---|---|---|
+| Pixel browser | TrackPageView dispara `fbq('track', 'PageView', {}, {eventID})` | ContactForm dispara `fbq('track', 'Lead', {}, {eventID: leadId})` | (opcional: clique em wa.me/tel via `/api/track`) |
+| CAPI server | TrackPageView -> `POST /api/track` com `event_id` igual | `/api/contact` dispara `sendMetaCAPI({eventName:'Lead', eventId: leadId})` | `POST /api/track {event_name:'Contact'}` |
+| GA4 server | `page_view` via `sendGA4Event` no `/api/track` | `generate_lead` via `sendGA4Event` no `/api/contact` | `contact` via `sendGA4Event` no `/api/track` |
+| GTM dataLayer | (gerenciado pelo GTM) | `dataLayer.push({event:'generate_lead', lead_id})` no ContactForm | (depende de tag GTM) |
+
+### 13.6 Como validar EMQ
+1. Pegue um `test_event_code` em Gerenciador de Eventos -> Test Events.
+2. Acesse `https://rochaadvogadosmt.com/?test_event_code=TESTxxxx` (codigo fica salvo em sessionStorage).
+3. Veja PageView aparecer em Test Events com `_eid` aplicado como `external_id`.
+4. Envie o formulario. Lead aparece em Test Events com EMQ esperado >= 9 (em + ph + fn + ln + country + ct + st + zp + fbp/fbc + external_id + ip + ua).
+5. Sem `test_event_code` os eventos vao para o pixel normal e contribuem para o EMQ agregado.
+
+### 13.7 Endpoint de debug Meta
+```
+GET /api/debug-payload?event_name=Lead&email=teste@teste.com&phone=65999999999&name=Joao+Silva
+```
+Retorna o JSON pronto para colar no Payload Helper Meta (https://developers.facebook.com/docs/marketing-api/conversions-api/payload-helper/).

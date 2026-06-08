@@ -36,6 +36,20 @@ function getGaSessionId(measurementId: string): string | undefined {
   return match ? match[1] : undefined
 }
 
+function getTestEventCode(): string {
+  if (typeof window === 'undefined') return ''
+  try {
+    const fromUrl = new URLSearchParams(window.location.search).get('test_event_code')
+    if (fromUrl) {
+      sessionStorage.setItem('_tec', fromUrl)
+      return fromUrl
+    }
+    return sessionStorage.getItem('_tec') ?? ''
+  } catch {
+    return ''
+  }
+}
+
 export default function ContactForm({ variant = 'light', modelo = 'a', className = '', ctaLabel }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -63,6 +77,7 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
 
     const form = e.currentTarget
     const measurementId = process.env.NEXT_PUBLIC_GA4_ID ?? ''
+    const testEventCode = getTestEventCode()
     const data = {
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
       email: (form.elements.namedItem('email') as HTMLInputElement).value,
@@ -75,6 +90,7 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
       modelo,
       ga_client_id: getGaClientId(),
       ga_session_id: getGaSessionId(measurementId),
+      ...(testEventCode && { test_event_code: testEventCode }),
     }
 
     try {
@@ -161,7 +177,7 @@ export default function ContactForm({ variant = 'light', modelo = 'a', className
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !phoneValid}
           className={
             isDark
               ? 'w-full bg-borde hover:bg-borde-deep text-white font-display font-bold py-4 px-6 rounded text-sm uppercase tracking-widest transition-colors disabled:opacity-60 animate-pulse-cta'
